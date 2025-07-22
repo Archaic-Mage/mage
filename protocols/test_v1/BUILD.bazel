@@ -1,0 +1,6 @@
+cc_library(
+    name = "test_v1",
+    hdrs = [
+        "TestMessage.hpp",
+    ]
+)
