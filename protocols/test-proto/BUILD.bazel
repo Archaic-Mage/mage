@@ -1,0 +1,18 @@
+load("@rules_proto_grpc_cpp//:defs.bzl", "cc_proto_library", "cpp_proto_compile")
+
+cc_proto_library(
+    name = "test_cc_proto",
+    protos = [
+        ":test_proto",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+)
+
+proto_library(
+    name = "test_proto",
+    srcs = [
+        "test.proto",
+    ],
+)

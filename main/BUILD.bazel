@@ -3,18 +3,21 @@ cc_library(
     hdrs = [
         "main.hpp",
     ],
+    deps =
+        [
+            "//protocols/test-proto:test_cc_proto",
+        ],
 )
-
 
 cc_binary(
     name = "mage",
     srcs = [
         "main.cpp",
     ],
-    deps = [
-        ":logger",
-    ],
     copts = [
         "-std=c++23",
+    ],
+    deps = [
+        ":logger",
     ],
 )
