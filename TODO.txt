@@ -1,0 +1,2 @@
+[] Add precommit checks - cpp, protobuf
+[] Make code base follow 'mage' namespace
