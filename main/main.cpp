@@ -1,7 +1,7 @@
 #include "main/main.hpp"
 
-std::int32_t main() {
-
+std::int32_t main()
+{
     test::AddressBook myAddressBook;
     auto* myPerson = myAddressBook.add_people();
     myPerson->set_name("Soham");

@@ -1,9 +1,9 @@
 #pragma once
 
-#include <string>
-#include <iostream>
-
 #include "protocols/test-proto/test.pb.h"
+
+#include <iostream>
+#include <string>
 
 struct Logger
 {
