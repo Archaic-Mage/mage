@@ -5,6 +5,8 @@
 #include <iostream>
 #include <string>
 
+namespace mage
+{
 struct Logger
 {
     inline static void info(std::string aMessage)
@@ -17,3 +19,4 @@ struct Logger
         Logger::info(aAddressBook.SerializeAsString());
     }
 };
+} // namespace mage
