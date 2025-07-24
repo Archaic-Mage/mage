@@ -1,4 +1,36 @@
 ---
+FormatStyle:     file
+CheckOptions:
+  - { key: readability-identifier-naming.ClassCase,             value: CamelCase  }
+  - { key: readability-identifier-naming.ClassMemberCase,       value: CamelCase  }
+  - { key: readability-identifier-naming.ClassMemberPrefix,     value: 'the'      }
+  - { key: readability-identifier-naming.ClassMethodCase,       value: camelBack  }
+  - { key: readability-identifier-naming.MethodCase,            value: camelBack  }
+  - { key: readability-identifier-naming.EnumCase,              value: CamelCase  }
+  - { key: readability-identifier-naming.EnumConstantCase,      value: aNy_CasE }
+  - { key: readability-identifier-naming.FunctionCase,          value: camelBack  }
+  - { key: readability-identifier-naming.InlineNamespaceCase,   value: lower_case }
+  - { key: readability-identifier-naming.LocalVariableCase,     value: CamelCase  }
+  - { key: readability-identifier-naming.LocalVariablePrefix,   value: 'my'       }
+  - { key: readability-identifier-naming.NamespaceCase,         value: lower_case }
+  - { key: readability-identifier-naming.PrivateMemberCase,     value: CamelCase  }
+  - { key: readability-identifier-naming.PrivateMemberPrefix,   value: 'the'      }
+  - { key: readability-identifier-naming.ParameterCase,         value: CamelCase  }
+  - { key: readability-identifier-naming.ParameterPrefix,       value: 'a'        }
+  - { key: readability-identifier-naming.ParameterIgnoredRegexp,value: 'an[A-Z].*'}
+  - { key: readability-identifier-naming.MemberCase,            value: camelBack  }
+  - { key: readability-identifier-naming.MemberPrefix,          value: ''         }
+  - { key: readability-identifier-naming.StructCase,            value: CamelCase  }
+  - { key: readability-identifier-naming.UnionCase,             value: CamelCase  }
+  - { key: readability-identifier-naming.TemplateParameterCase, value: CamelCase  }
+  - { key: readability-identifier-naming.TypeAliasCase,         value: CamelCase  }
+  - { key: readability-identifier-naming.TypedefCase,           value: CamelCase  }
+  - { key: readability-identifier-naming.StaticConstantCase,    value: CamelCase  }
+  - { key: readability-identifier-naming.StaticConstantPrefix,  value: ''         }
+  - { key: readability-identifier-naming.ClassConstantCase,     value: CamelCase  }
+  - { key: readability-identifier-naming.ClassConstantPrefix,   value: ''         }
+  - { key: readability-identifier-naming.GlobalConstantCase,    value: CamelCase  }
+
 # https://reviews.llvm.org/D72566 Don't use wildcards
 Checks: '-*,
     bugprone-argument-comment,
@@ -144,47 +176,12 @@ Checks: '-*,
     readability-static-definition-in-anonymous-namespace,
     readability-string-compare,
     readability-uniqueptr-delete-release,
-    readability-uppercase-literal-suffix'
+    readability-uppercase-literal-suffix,
+    readability-identifier-naming'
 
 # TODO(https://reviews.llvm.org/D90835?id=303121)
 #  gtest macros are incorrectly identified as our own code, leading to many false-positives from these checks:
 #  - cppcoreguidelines-avoid-non-const-global-variables
 #  - cppcoreguidelines-special-member-functions
 #  - cppcoreguidelines-avoid-goto
-
-
-FormatStyle:     file
-CheckOptions:
-  - { key: readability-identifier-naming.ClassCase,             value: CamelCase  }
-  - { key: readability-identifier-naming.ClassMemberCase,       value: CamelCase  }
-  - { key: readability-identifier-naming.ClassMemberPrefix,     value: 'the'      }
-  - { key: readability-identifier-naming.ClassMethodCase,       value: camelBack  }
-  - { key: readability-identifier-naming.MethodCase,            value: camelBack  }
-  - { key: readability-identifier-naming.EnumCase,              value: CamelCase  }
-  - { key: readability-identifier-naming.EnumConstantCase,      value: aNy_CasE }
-  - { key: readability-identifier-naming.FunctionCase,          value: camelBack  }
-  - { key: readability-identifier-naming.InlineNamespaceCase,   value: lower_case }
-  - { key: readability-identifier-naming.LocalVariableCase,     value: CamelCase  }
-  - { key: readability-identifier-naming.LocalVariablePrefix,   value: 'my'       }
-  - { key: readability-identifier-naming.NamespaceCase,         value: lower_case }
-  - { key: readability-identifier-naming.PrivateMemberCase,     value: CamelCase  }
-  - { key: readability-identifier-naming.PrivateMemberPrefix,   value: 'the'      }
-  - { key: readability-identifier-naming.ParameterCase,         value: CamelCase  }
-  - { key: readability-identifier-naming.ParameterPrefix,       value: 'a'        }
-  - { key: readability-identifier-naming.ParameterIgnoredRegexp,value: 'an[A-Z].*'}
-  - { key: readability-identifier-naming.MemberCase,            value: camelBack  }
-  - { key: readability-identifier-naming.MemberPrefix,          value: ''         }
-  - { key: readability-identifier-naming.StructCase,            value: CamelCase  }
-  - { key: readability-identifier-naming.UnionCase,             value: CamelCase  }
-  - { key: readability-identifier-naming.TemplateParameterCase, value: CamelCase  }
-  - { key: readability-identifier-naming.TypeAliasCase,         value: CamelCase  }
-  - { key: readability-identifier-naming.TypedefCase,           value: CamelCase  }
-  - { key: readability-identifier-naming.StaticConstantCase,    value: CamelCase  }
-  - { key: readability-identifier-naming.StaticConstantPrefix,  value: ''         }
-  - { key: readability-identifier-naming.ClassConstantCase,     value: CamelCase  }
-  - { key: readability-identifier-naming.ClassConstantPrefix,   value: ''         }
-  - { key: readability-identifier-naming.GlobalConstantCase,    value: CamelCase  }
----
-InheritParentConfig: true
-Checks: 'readability-identifier-naming'
 ...
