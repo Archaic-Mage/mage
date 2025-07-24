@@ -1,0 +1,10 @@
+cc_test(
+    name = "cc-lib-test",
+    srcs = [
+        "FenwickTreeTest.cpp",
+    ],
+    deps = [
+        "//utl/containers:cc-lib",
+        "@googletest//:gtest_main",
+    ],
+)

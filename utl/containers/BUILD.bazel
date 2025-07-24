@@ -1,0 +1,12 @@
+package(
+    default_visibility = [
+        "//visibility:public",
+    ],
+)
+
+cc_library(
+    name = "cc-lib",
+    hdrs = [
+        "FenwickTree.hpp",
+    ],
+)
