@@ -1,0 +1,18 @@
+directories:
+  .
+
+additional_languages:
+  python
+
+test_sources:
+  .
+
+build_flags:
+  --cxxopt=-std=c++23
+
+test_flags:
+  --flaky_test_attempts=3
+  --test_timeout=300
+
+targets:
+  //...
