@@ -5,7 +5,7 @@
 
 #include "protocols/test-proto/test.pb.h"
 
-struct Logger 
+struct Logger
 {
     inline static void info(std::string aMessage)
     {

@@ -13,4 +13,3 @@ struct TestMessage2 {
     std::uint32_t theUserId;
     std::array<char, 30> theUserInfo;
 };
-
