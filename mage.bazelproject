@@ -9,10 +9,12 @@ test_sources:
 
 build_flags:
   --cxxopt=-std=c++23
+  --macos_minimum_os=13.3
 
 test_flags:
   --flaky_test_attempts=3
   --test_timeout=300
+  --macos_minimum_os=13.3
 
 targets:
   //...

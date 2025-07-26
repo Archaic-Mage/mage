@@ -1,0 +1,30 @@
+package(
+    default_visibility = [
+        "//visibility:public",
+    ],
+)
+
+cc_library(
+    name = "log",
+    hdrs = [
+        "Log.hpp",
+    ],
+    deps = [
+        "@abseil-cpp//absl/log:check",
+        "@abseil-cpp//absl/log:log",
+    ],
+)
+
+cc_library(
+    name = "log-stdout-sink",
+    srcs = [
+        "StdoutLogSink.cpp",
+    ],
+    hdrs = [
+        "StdoutLogSink.hpp",
+    ],
+    deps = [
+        "@abseil-cpp//absl/log:initialize",
+        "@abseil-cpp//absl/log:log_sink_registry",
+    ],
+)
