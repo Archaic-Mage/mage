@@ -38,17 +38,17 @@ TEST_F(FenwickTreeTest, CheckInsertTwoElements)
 
 TEST_F(FenwickTreeTest, TreeSupportForMultiplication)
 {
-    theVictim = std::make_unique<FenwickTree<std::int64_t, MaxSize>>(
+    auto myVictimWithMulSupport = std::make_unique<FenwickTree<std::int64_t, MaxSize, FillWithOnes::Enabled>>(
         [](const auto& aFirst, const auto& aSecond)
         {
             return aFirst * aSecond;
         });
-    theVictim->insertDiffAt(0, 1);
-    theVictim->insertDiffAt(1, 2);
-    theVictim->insertDiffAt(2, 3);
-    EXPECT_EQ(theVictim->getAccumulation(0), 1);
-    EXPECT_EQ(theVictim->getAccumulation(1), 2);
-    EXPECT_EQ(theVictim->getAccumulation(2), 6);
+    myVictimWithMulSupport->insertDiffAt(0, 1);
+    myVictimWithMulSupport->insertDiffAt(1, 2);
+    myVictimWithMulSupport->insertDiffAt(2, 3);
+    EXPECT_EQ(myVictimWithMulSupport->getAccumulation(0), 1);
+    EXPECT_EQ(myVictimWithMulSupport->getAccumulation(1), 2);
+    EXPECT_EQ(myVictimWithMulSupport->getAccumulation(2), 6);
 }
 
 TEST_F(FenwickTreeTest, TreeSupportsUpdate)
