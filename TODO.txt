@@ -1,2 +1,5 @@
 [x] Add precommit checks - cpp, protobuf
 [x] Make code base follow 'mage' namespace
+[] Make gerrit use bot for github actions
+[] Add way to create tickets for MAGE
+[] Add clang-tidy check on github actions
