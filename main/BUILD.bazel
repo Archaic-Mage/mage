@@ -14,9 +14,6 @@ cc_binary(
     srcs = [
         "main.cpp",
     ],
-    copts = [
-        "-std=c++23",
-    ],
     deps = [
         ":logger",
         "//utl/log",

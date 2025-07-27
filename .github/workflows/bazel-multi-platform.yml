@@ -1,0 +1,69 @@
+name: Bazel MultiPlatform
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Bazel C++ Build & Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Install C++ build tools on Linux
+      - name: Install Linux build tools
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3 zip unzip
+
+      # (Optional) Install C++ prerequisites on macOS
+      - name: Install macOS prerequisites
+        if: runner.os == 'macOS'
+        run: |
+          brew update
+          brew install zip unzip
+
+      # Windows runners include Visual Studio Build Tools by default
+
+      # Cache Bazel outputs and external dependencies
+      - name: Cache Bazel
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/bazel
+            bazel-out
+            bazel-*
+            external
+          key: ${{ runner.os }}-bazel-${{ hashFiles('**/WORKSPACE', '**/*.bzl') }}
+          restore-keys: |
+            ${{ runner.os }}-bazel-
+
+      # Setup Bazel
+      - name: Setup Bazel
+        uses: bazel-contrib/setup-bazel@0.15.0
+        with:
+          bazelisk-cache: true
+          disk-cache: ${{ github.workflow }}
+
+      # Optional: Confirm toolchain
+      - name: Configure Bazel C++ toolchain
+        run: |
+          echo "Runner OS: ${{ runner.os }}"
+          # Bazel will auto-detect the appropriate C++ toolchain
+
+      # Build all C++ targets
+      - name: Bazel Build
+        run: bazel build --cxxopt=-std=c++20 --macos_minimum_os=13.3 //...
+
+      # Run C++ tests
+      - name: Bazel Test
+        run: bazel test --cxxopt=-std=c++20 --macos_minimum_os=13.3 --test_output=errors //...
