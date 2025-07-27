@@ -1,2 +1,3 @@
 [x] Add precommit checks - cpp, protobuf
 [x] Make code base follow 'mage' namespace
+[] Make gerrit use bot for github actions
