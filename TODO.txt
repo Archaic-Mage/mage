@@ -5,6 +5,6 @@
 [] Add clang-tidy check on github actions
 
 A github action that runs on every addition to mage/**,
-this would trigger other actions (which would give their labels 
+this would trigger other actions (which would give their labels
 on gerrit). Once all the invoked actions are complete and successfull
 the parent action would give a verified +1 on the commit.
