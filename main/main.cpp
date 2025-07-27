@@ -12,9 +12,6 @@ std::int32_t main()
     auto* myPhone = myPerson->add_phones();
     myPhone->set_number("957209570");
     myPhone->set_type(mage::test::Person_PhoneType_PHONE_TYPE_MOBILE);
-    mage::Logger::testInfo(myAddressBook);
-    mage::Logger::info(myPerson->email());
-    mage::Logger::info("Hello World!");
 
     // TODO (soham) : extract out absl in custom wrapper
     absl::InitializeLog();
@@ -24,6 +21,8 @@ std::int32_t main()
     const auto mySink = std::make_unique<mage::StdoutLogSink>();
     absl::AddLogSink(mySink.get());
 
+    MAGE_LOG_INFO(myAddressBook.SerializeAsString());
+    MAGE_LOG_INFO("This person email: {}", myPerson->email());
     MAGE_LOG_INFO("Hello World!");
     MAGE_LOG_WARN("Hi World!");
 

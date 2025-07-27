@@ -62,7 +62,7 @@ jobs:
           env.CHANGE_ID
         run: |
           curl -u "${{ secrets.GERRIT_USER }}:${{ secrets.GERRIT_PASSWORD }}" \
-               -H "Content-Type: application/json"
+               -H "Content-Type: application/json" \
                -X POST \
                -d '{"message":"Pre-commit checks passed","labels":{"Verified":1}}' \
-               "${{ env.GERRIT_URL }}/changes/${{ env.CHANGE_ID }}/revisions/current/review"
+               "${{ env.GERRIT_URL }}/a/changes/${{ env.CHANGE_ID }}/revisions/current/review"
