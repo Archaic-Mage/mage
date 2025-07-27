@@ -2,9 +2,14 @@ name: Pre-commit Checks
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - refs/**
   pull_request:
     branches: [ main ]
+
+env:
+  GERRIT_URL: https://gerrithub.io/c/Archaic-Mage/mage
 
 jobs:
   pre-commit:
@@ -41,4 +46,27 @@ jobs:
 
       # 5) Run all pre-commit hooks against the repo
       - name: Run pre-commit
+        id: tidy
         run: pre-commit run --all-files --show-diff-on-failure
+
+      # 6) If this was a Gerrit push (refs/changes/…), extract its Change-ID
+      - name: Determine Gerrit Change ID
+        if: >
+          github.event_name == 'push' &&
+          startsWith(github.ref, 'refs/changes/')
+        run: |
+           REF="${GITHUB_REF}"
+           CHANGE_ID=$(echo "$REF" | sed -E 's,refs/changes/([0-9]+)/.*,\1,')
+           echo "CHANGE_ID=$CHANGE_ID" >> $GITHUB_ENV
+
+      - name: Post Verified +1 to Gerrit
+        if: >
+          steps.tidy.outcome == 'success' &&
+          github.event_name == 'push' &&
+          env.CHANGE_ID
+        run: |
+          curl -u "${{ secrets.GERRIT_USER }}:${{ secrets.GERRIT_PASSWORD }}" \
+               -H "Content-Type: application/json"
+               -X POST \
+               -d '{"message":"Pre-commit checks passed","labels":{"Verified":1}}' \
+               "${{ env.GERRIT_URL }}/+/${{ env.CHANGE_ID }}"
