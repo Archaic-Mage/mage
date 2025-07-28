@@ -91,18 +91,57 @@ jobs:
             echo "vote=-1" >> $GITHUB_OUTPUT
           fi
 
-      - name: Post Clean-Code to Gerrit
+      - name: Get label
+        if: always()
+        id: label
+        run: |
+          case "${{ matrix.os }}" in
+            ubuntu-latest) echo "label=Verified-Ubuntu" >> $GITHUB_OUTPUT ;;
+            macos-latest)  echo "label=Verified-Mac" >> $GITHUB_OUTPUT ;;
+            *)             echo "label=Verified" >> $GITHUB_OUTPUT ;;
+          esac
+
+      - name: Post result to Gerrit
         if: always()
         shell: bash
         env:
           RUN_URL: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         run: |
-          echo ${VOTE}
           curl -u "${{ secrets.GERRIT_USER }}:${{ secrets.GERRIT_PASSWORD }}" \
                -H "Content-Type: application/json" \
                -X POST \
                -d '{
                  "message": "GitHub Actions run on ${{ env.RUN_URL }}",
-                 "labels": { "Verified": "${{ steps.vote.outputs.vote }}" }
+                 "labels": { "${{ steps.label.outputs.label }}": "${{ steps.vote.outputs.vote }}" }
                }' \
                "${{ env.GERRIT_URL }}/a/changes/${{ steps.extract.outputs.change_id }}/revisions/current/review"
+
+  report:
+    name: Report to Gerrit
+    needs: build
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Determine overall matrix result
+        id: check
+        run: |
+          if [ "${{ needs.build.result }}" == "success" ]; then
+            echo "vote=+1" >> $GITHUB_OUTPUT
+          else
+            echo "vote=-1" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Post result to Gerrit
+        shell: bash
+        env:
+          RUN_URL: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        run: |
+          curl -u "${{ secrets.GERRIT_USER }}:${{ secrets.GERRIT_PASSWORD }}" \
+               -H "Content-Type: application/json" \
+               -X POST \
+               -d '{
+                 "message": "GitHub Actions run: ${{ env.RUN_URL }}",
+                 "labels": { "Verified": "${{ steps.check.outputs.vote }}" }
+               }' \
+               "${{ env.GERRIT_URL }}/a/changes/${{ github.ref_name }}/revisions/current/review"
