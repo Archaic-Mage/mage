@@ -2,12 +2,10 @@ name: Pre-commit Checks
 
 on:
   create: {}
-  push: {}
-  workflow_dispatch:
-    inputs:
-      commit_sha:
-        description: 'Gerrit change commit SHA'
-        required: true
+  push:
+    branches:
+      - main
+      - 'changes/**'
 
 env:
   GERRIT_URL: https://gerrithub.io
@@ -51,18 +49,36 @@ jobs:
         id: tidy
         run: pre-commit run --all-files --show-diff-on-failure
 
+      - name: Extract Change‑Id
+        if: always()
+        id: extract
+        # GITHUB_REF is like "changes/123"
+        run: |
+          change_id="${GITHUB_REF#refs/heads/changes/}"
+          echo "change_id=$change_id" >> $GITHUB_OUTPUT
+
+      - name: Get VOTE
+        if: always()
+        id: vote
+        run: |
+          if [[ "${{ job.status }}" == 'success' ]]; then
+            echo "vote=+1" >> $GITHUB_OUTPUT
+          else
+            echo "vote=-1" >> $GITHUB_OUTPUT
+          fi
+
       - name: Post Clean-Code to Gerrit
         if: always()
         shell: bash
+        env:
+          RUN_URL: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         run: |
-          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          if [[ "${{ job.status }}" == 'success' ]]; then
-            echo 'VOTE="+1"' >> $GITHUB_ENV
-          else
-            echo 'VOTE="-1"' >> $GITHUB_ENV
-          fi
+          echo ${VOTE}
           curl -u "${{ secrets.GERRIT_USER }}:${{ secrets.GERRIT_PASSWORD }}" \
                -H "Content-Type: application/json" \
                -X POST \
-               -d '{"message":"Pre-commit checks ['${{ github.run_number }}']('${RUN_URL}')","labels":{"Clean-Code":${VOTE}}}' \
-               "${{ env.GERRIT_URL }}/a/changes/${{ env.CHANGE_ID }}/revisions/current/review"
+               -d '{
+                 "message": "GitHub Actions run",
+                 "labels": { "Clean-Code: "${{ steps.vote.outputs.vote }}" }
+               }' \
+               "${{ env.GERRIT_URL }}/a/changes/${{ steps.extract.outputs.change_id }}/revisions/current/review"
