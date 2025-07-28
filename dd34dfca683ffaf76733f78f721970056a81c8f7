@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c71f3645_f80d57f9",
+        "filename": ".github/workflows/pre-commit-checks.yml",
+        "patchSetId": 14
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1038960
+      },
+      "writtenOn": "2025-07-28T18:24:31Z",
+      "side": 1,
+      "message": "make this a github verification bot.",
+      "range": {
+        "startLine": 77,
+        "startChar": 31,
+        "endLine": 77,
+        "endChar": 40
+      },
+      "revId": "dd34dfca683ffaf76733f78f721970056a81c8f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
