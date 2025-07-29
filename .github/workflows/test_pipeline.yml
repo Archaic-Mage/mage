@@ -1,0 +1,86 @@
+name: Test Pipelin
+on:
+  push:
+    branches:
+      - main
+      - 'changes/**'
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: '0 0 * * 0'
+
+permissions:
+  contents: read
+  actions: write
+  packages: read
+  security-events: write
+
+jobs:
+  detect_change_id:
+    runs-on: ubuntu-latest
+    outputs:
+      change_id: ${{ steps.extract.outputs.change_id }}
+    steps:
+      # If this ref is refs/heads/changes/<id>, strip the prefix; else leave blank
+      - name: Extract Change‑Id
+        id: extract
+        run: |
+          if [[ "${GITHUB_REF#refs/heads/changes/}" != "$GITHUB_REF" ]]; then
+            echo "::set-output name=change_id::${GITHUB_REF#refs/heads/changes/}"
+          else
+            echo "::set-output name=change_id::"
+          fi
+
+  precommit:
+    needs: detect_change_id
+    uses: ./.github/workflows/pre-commit-checks.yml
+    with:
+      gerrit_change_id: ${{ needs.detect_change_id.outputs.change_id }}
+    secrets: inherit
+
+  multiplatformtest:
+    needs: detect_change_id
+    uses: ./.github/workflows/bazel-multi-platform.yml
+    with:
+      gerrit_change_id: ${{ needs.detect_change_id.outputs.change_id }}
+    secrets: inherit
+
+  codeql:
+    needs: detect_change_id
+    uses: ./.github/workflows/codeql.yml
+    with:
+      gerrit_change_id: ${{ needs.detect_change_id.outputs.change_id }}
+    secrets: inherit
+
+  report:
+    name: Report to Gerrit
+    needs:
+      - precommit
+      - multiplatformtest
+      - codeql
+      - detect_change_id
+    runs-on: ubuntu-latest
+    if: ${{ inputs.gerrit_change_id != '' }}
+    steps:
+      - name: Determine overall matrix result
+        id: check
+        run: |
+          if [ "${{ needs.build.result }}" == "success" ]; then
+            echo "vote=+1" >> $GITHUB_OUTPUT
+          else
+            echo "vote=-1" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Post result to Gerrit
+        shell: bash
+        env:
+          RUN_URL: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        run: |
+          curl -u "${{ secrets.GERRIT_USER }}:${{ secrets.GERRIT_PASSWORD }}" \
+               -H "Content-Type: application/json" \
+               -X POST \
+               -d '{
+                 "message": "GitHub Actions run: ${{ env.RUN_URL }}",
+                 "labels": { "Verified": "${{ steps.check.outputs.vote }}" }
+               }' \
+               "https://gerrithub.io/a/changes/${{ needs.detect_change_id.outputs.change_id }}/revisions/current/review"
