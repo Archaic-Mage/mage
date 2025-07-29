@@ -1,0 +1,51 @@
+name: Test Pipelin
+on:
+  push:
+    branches:
+      - main
+      - 'changes/**'
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: '0 0 * * 0'
+
+permissions:
+  packages: read
+  security-events: write
+
+jobs:
+  detect_change_id:
+    runs-on: ubuntu-latest
+    outputs:
+      change_id: ${{ steps.extract.outputs.change_id }}
+    steps:
+      # If this ref is refs/heads/changes/<id>, strip the prefix; else leave blank
+      - name: Extract Change‑Id
+        id: extract
+        run: |
+          if [[ "${GITHUB_REF#refs/heads/changes/}" != "$GITHUB_REF" ]]; then
+            echo "::set-output name=change_id::${GITHUB_REF#refs/heads/changes/}"
+          else
+            echo "::set-output name=change_id::"
+          fi
+
+  precommit:
+    needs: detect_change_id
+    uses: ./.github/workflows/pre-commit-checks.yml
+    with:
+      gerrit_change_id: ${{ needs.detect_change_id.outputs.change_id }}
+    secrets: inherit
+
+  multiplatformtest:
+    needs: detect_change_id
+    uses: ./.github/workflows/bazel-multi-platform.yml
+    with:
+      gerrit_change_id: ${{ needs.detect_change_id.outputs.change_id }}
+    secrets: inherit
+
+  codeql:
+    needs: detect_change_id
+    uses: ./.github/workflows/codeql.yml
+    with:
+      gerrit_change_id: ${{ needs.detect_change_id.outputs.change_id }}
+    secrets: inherit
