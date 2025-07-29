@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# $1 = name of remote (e.g. "gerrit"), $2 = remote URL
+remote_name="$1"
+remote_url="$2"
+
+# Only trigger on pushes to Gerrit
+if [[ "$remote_name" != "origin" && ! "$remote_url" =~ gerrit ]]; then
+  exit 0
+fi
+
+# Read lines of "<local_ref> <local_sha> <remote_ref> <remote_sha>"
+while read local_ref local_sha remote_ref remote_sha; do
+  # Only mirror patchset pushes (i.e. refs/for/* in Gerrit)
+  if [[ "$remote_ref" == refs/for/* ]]; then
+    # Extract the Gerrit Change‑Id from the commit message
+    change_id=$(git log -1 --format=%B "$local_sha" \
+                | grep -Eo 'Change-Id: I[0-9a-f]+' \
+                | awk '{print $2}')
+
+    if [[ -n "$change_id" ]]; then
+      echo "Mirroring Gerrit change $change_id to GitHub…"
+      # Push that exact commit to GitHub under refs/changes/{Change‑Id}
+      git push -f github \
+          "$local_sha:refs/heads/changes/$change_id"
+    else
+      echo "⚠️  No Change‑Id found in commit $local_sha; skipping mirror."
+    fi
+  fi
+done
+
+exit 0
