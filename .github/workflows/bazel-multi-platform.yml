@@ -1,15 +1,13 @@
 name: Bazel MultiPlatform
 
 on:
-  push:
-    branches:
-      - main
-      - 'changes/**'
-  pull_request:
-    branches: [ main ]
-
-env:
-  GERRIT_URL: https://gerrithub.io
+  workflow_call:
+    inputs:
+      gerrit_change_id:
+        description: 'Gerrit change id to post the result'
+        required: false
+        type: string
+        default: ''
 
 jobs:
   build:
@@ -36,8 +34,6 @@ jobs:
         run: |
           brew update
           brew install zip unzip
-
-      # Windows runners include Visual Studio Build Tools by default
 
       # Cache Bazel outputs and external dependencies
       - name: Cache Bazel
@@ -73,16 +69,8 @@ jobs:
       - name: Bazel Test
         run: bazel test --cxxopt=-std=c++20 --macos_minimum_os=13.3 --test_output=errors //...
 
-      - name: Extract Change‑Id
-        if: always()
-        id: extract
-        # GITHUB_REF is like "changes/123"
-        run: |
-          change_id="${GITHUB_REF#refs/heads/changes/}"
-          echo "change_id=$change_id" >> $GITHUB_OUTPUT
-
       - name: Get VOTE
-        if: always()
+        if: ${{ always() && inputs.gerrit_change_id != '' }}
         id: vote
         run: |
           if [[ "${{ job.status }}" == 'success' ]]; then
@@ -92,7 +80,7 @@ jobs:
           fi
 
       - name: Get label
-        if: always()
+        if: ${{ always() && inputs.gerrit_change_id != '' }}
         id: label
         run: |
           case "${{ matrix.os }}" in
@@ -102,46 +90,14 @@ jobs:
           esac
 
       - name: Post result to Gerrit
-        if: always()
+        if: ${{ always() && inputs.gerrit_change_id != '' }}
         shell: bash
-        env:
-          RUN_URL: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         run: |
           curl -u "${{ secrets.GERRIT_USER }}:${{ secrets.GERRIT_PASSWORD }}" \
                -H "Content-Type: application/json" \
                -X POST \
                -d '{
-                 "message": "GitHub Actions run on ${{ env.RUN_URL }}",
+                 "message": "Multi-Platform Bazel Test result",
                  "labels": { "${{ steps.label.outputs.label }}": "${{ steps.vote.outputs.vote }}" }
                }' \
-               "${{ env.GERRIT_URL }}/a/changes/${{ steps.extract.outputs.change_id }}/revisions/current/review"
-
-  report:
-    name: Report to Gerrit
-    needs: build
-    runs-on: ubuntu-latest
-    if: always()
-
-    steps:
-      - name: Determine overall matrix result
-        id: check
-        run: |
-          if [ "${{ needs.build.result }}" == "success" ]; then
-            echo "vote=+1" >> $GITHUB_OUTPUT
-          else
-            echo "vote=-1" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Post result to Gerrit
-        shell: bash
-        env:
-          RUN_URL: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-        run: |
-          curl -u "${{ secrets.GERRIT_USER }}:${{ secrets.GERRIT_PASSWORD }}" \
-               -H "Content-Type: application/json" \
-               -X POST \
-               -d '{
-                 "message": "GitHub Actions run: ${{ env.RUN_URL }}",
-                 "labels": { "Verified": "${{ steps.check.outputs.vote }}" }
-               }' \
-               "${{ env.GERRIT_URL }}/a/${{ github.ref_name }}/revisions/current/review"
+               "https://gerrithub.io/a/changes/${{ inputs.gerrit_change_id }}/revisions/current/review"
