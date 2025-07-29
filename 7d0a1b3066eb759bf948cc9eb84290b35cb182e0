@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8d922e5_32882935",
+        "filename": ".github/workflows/bazel-multi-platform.yml",
+        "patchSetId": 5
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1038960
+      },
+      "writtenOn": "2025-07-29T15:44:14Z",
+      "side": 1,
+      "message": "this link should now also include the job number since action run is link is the same.",
+      "range": {
+        "startLine": 98,
+        "startChar": 55,
+        "endLine": 98,
+        "endChar": 63
+      },
+      "revId": "7d0a1b3066eb759bf948cc9eb84290b35cb182e0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1468e6f7_614a9bb7",
+        "filename": ".github/workflows/bazel-multi-platform.yml",
+        "patchSetId": 5
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1038960
+      },
+      "writtenOn": "2025-07-29T15:44:14Z",
+      "side": 1,
+      "message": "maybe could move this to the main test pipeline",
+      "range": {
+        "startLine": 109,
+        "startChar": 2,
+        "endLine": 113,
+        "endChar": 44
+      },
+      "revId": "7d0a1b3066eb759bf948cc9eb84290b35cb182e0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f5f7772_3b7849ca",
+        "filename": ".github/workflows/test_pipeline.yml",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1038960
+      },
+      "writtenOn": "2025-07-29T15:44:14Z",
+      "side": 1,
+      "message": "pipeline",
+      "range": {
+        "startLine": 1,
+        "startChar": 16,
+        "endLine": 1,
+        "endChar": 18
+      },
+      "revId": "7d0a1b3066eb759bf948cc9eb84290b35cb182e0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e251a411_5dcc1cb9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1038960
+      },
+      "writtenOn": "2025-07-29T15:44:14Z",
+      "side": 1,
+      "message": "improve on the commit message",
+      "revId": "7d0a1b3066eb759bf948cc9eb84290b35cb182e0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
