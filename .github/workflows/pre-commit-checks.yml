@@ -1,14 +1,13 @@
 name: Pre-commit Checks
 
 on:
-  create: {}
-  push:
-    branches:
-      - main
-      - 'changes/**'
-
-env:
-  GERRIT_URL: https://gerrithub.io
+  workflow_call:
+    inputs:
+      gerrit_change_id:
+        description: 'Gerrit change id to post the result'
+        required: false
+        type: string
+        default: ''
 
 jobs:
   pre-commit:
@@ -21,7 +20,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          ref: ${{ github.event.inputs.commit_sha }}
 
       # 2) Cache pre-commit environments for speed
       - name: Cache pre-commit
@@ -49,19 +47,22 @@ jobs:
         id: tidy
         run: pre-commit run --all-files --show-diff-on-failure
 
-      - name: Extract Change‑Id
-        if: always()
-        id: extract
-        # GITHUB_REF is like "changes/123"
+      - name: test
         run: |
-          change_id="${GITHUB_REF#refs/heads/changes/}"
-          echo "change_id=$change_id" >> $GITHUB_OUTPUT
+          echo "Simulating failure"
+          exit 1
 
+  report:
+    needs: pre-commit
+    if: ${{ always() && inputs.gerrit_change_id != '' }}
+    name: Report Result to Gerrit
+    runs-on: ubuntu-latest
+    steps:
       - name: Get VOTE
         if: always()
         id: vote
         run: |
-          if [[ "${{ job.status }}" == 'success' ]]; then
+          if [[ "${{ needs.pre-commit.result }}" == 'success' ]]; then
             echo "vote=+1" >> $GITHUB_OUTPUT
           else
             echo "vote=-1" >> $GITHUB_OUTPUT
@@ -70,15 +71,13 @@ jobs:
       - name: Post Clean-Code to Gerrit
         if: always()
         shell: bash
-        env:
-          RUN_URL: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         run: |
           echo ${VOTE}
           curl -u "${{ secrets.GERRIT_USER }}:${{ secrets.GERRIT_PASSWORD }}" \
                -H "Content-Type: application/json" \
                -X POST \
                -d '{
-                 "message": "GitHub Actions run on ${{ env.RUN_URL }}",
+                 "message": "Pre-commit check result",
                  "labels": { "Clean-Code": "${{ steps.vote.outputs.vote }}" }
                }' \
-               "${{ env.GERRIT_URL }}/a/changes/${{ steps.extract.outputs.change_id }}/revisions/current/review"
+               "https://gerrithub.io/a/changes/${{ inputs.gerrit_change_id }}/revisions/current/review"
