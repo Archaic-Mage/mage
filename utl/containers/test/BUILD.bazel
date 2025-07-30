@@ -1,7 +1,9 @@
 cc_test(
     name = "cc-lib-test",
+    size = "small",
     srcs = [
         "FenwickTreeTest.cpp",
+        "RingBufferTest.cpp",
     ],
     deps = [
         "//utl/containers:cc-lib",
