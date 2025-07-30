@@ -1,0 +1,8 @@
+common --cxxopt=-std=c++23
+common --cxxopt=-Werror
+common --macos_minimum_os=13.3
+
+test --flaky_test_attempts=3
+test --test_timeout=300
+
+try-import %workspace%/.bazelrc.user

@@ -10,8 +10,17 @@ cc_library(
         "Log.hpp",
     ],
     deps = [
-        "@abseil-cpp//absl/log:check",
         "@abseil-cpp//absl/log:log",
+    ],
+)
+
+cc_library(
+    name = "check",
+    hdrs = [
+        "Check.hpp",
+    ],
+    deps = [
+        "@abseil-cpp//absl/log:check",
     ],
 )
 
