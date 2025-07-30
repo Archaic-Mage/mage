@@ -26,9 +26,9 @@ jobs:
         id: extract
         run: |
           if [[ "${GITHUB_REF#refs/heads/changes/}" != "$GITHUB_REF" ]]; then
-            echo "::set-output name=change_id::${GITHUB_REF#refs/heads/changes/}"
+            echo "change_id=${GITHUB_REF#refs/heads/changes/}" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=change_id::"
+            echo "change_id=" >> $GITHUB_OUTPUT
           fi
 
       - name: Post Actions Run Information
@@ -42,7 +42,7 @@ jobs:
                -d '{
                  "message": "GitHub Actions run: ${{ env.RUN_URL }}"
                }' \
-               "https://gerrithub.io/a/changes/${{ needs.detect_change_id.outputs.change_id }}/revisions/current/review"
+               "https://gerrithub.io/a/changes/${{ steps.extract.outputs.change_id }}/revisions/current/review"
 
   precommit:
     needs: detect_change_id

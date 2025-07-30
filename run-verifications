@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+COMMITS=$(git log origin/main..HEAD --pretty=format:"%H" | tr '\n' ' ')
+for commit in $COMMITS; do
+ change_id=$(git show -s --format='%B' "$commit" | grep 'Change-Id:' | awk '{print $2}')
+ if [[ -n "$change_id" ]]; then
+   echo "Mirroring Gerrit change $change_id to GitHub…"
+   # Push that exact commit to GitHub under refs/changes/{Change‑Id}
+   git push -f github \
+       "$commit:refs/heads/changes/$change_id"
+ else
+   echo "⚠️ No Change‑Id found in commit $commit; skipping mirror."
+ fi
+done
+
+exit 0
