@@ -1,6 +1,5 @@
 #pragma once
 
-#include "absl/log/check.h"
 #include "absl/log/log.h"
 
 #define MAGE_LOG_IMPL(Level_, Format_, ...) LOG(Level_) << std::format(Format_, ##__VA_ARGS__);
