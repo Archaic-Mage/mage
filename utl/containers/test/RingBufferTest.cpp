@@ -1,5 +1,7 @@
 #include "utl/containers/RingBuffer.hpp"
 
+#include "utl/cast/Narrow.hpp"
+
 #include <thread>
 
 #include <gtest/gtest.h>
@@ -41,7 +43,7 @@ TEST_F(RingBufferTest, WriteAndReadDataFromSharedBuffer)
     std::array<std::int64_t, 5> myData;
     for (std::size_t myI = 0; myI < 5; ++myI)
     {
-        myData[myI] = 100 + myI;
+        myData[myI] = 100 + narrow_cast<std::int64_t>(myI);
     }
     theSharedMemoryBuffer->write(0, std::as_bytes(std::span(myData)));
     std::int64_t myReadNum = 0;
@@ -60,7 +62,7 @@ TEST_F(RingBufferTest, WriteAndReadDataFromFileBuffer)
     std::array<std::int64_t, 5> myData;
     for (std::size_t myI = 0; myI < 5; ++myI)
     {
-        myData[myI] = 100 + myI;
+        myData[myI] = 100 + narrow_cast<std::int64_t>(myI);
     }
     theFileMemoryBuffer->write(0, std::as_bytes(std::span(myData)));
     std::int64_t myReadNum = 0;
