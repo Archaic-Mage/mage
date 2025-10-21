@@ -1,0 +1,36 @@
+{
+  "comments": [],
+  "submitRequirementResults": [
+    {
+      "submitRequirement": {
+        "name": "Clean-Code",
+        "description": {
+          "value": "Clean-Code must be +1"
+        },
+        "applicabilityExpression": {
+          "value": {
+            "expressionString": "-branch:refs/meta/config"
+          }
+        },
+        "submittabilityExpression": {
+          "expressionString": "label:Clean-Code\u003dMAX"
+        },
+        "overrideExpression": {},
+        "allowOverrideInChildProjects": true
+      },
+      "applicabilityExpressionResult": {
+        "value": {"expression":{"expressionString":"-branch:refs/meta/config"},"status":"PASS","errorMessage":{"value":null},"passingAtoms":[],"failingAtoms":["branch:refs/meta/config"],"atomExplanations":{"value":{"branch:refs/meta/config":""}}}
+      },
+      "submittabilityExpressionResult": {
+        "value": {"expression":{"expressionString":"label:Clean-Code=MAX"},"status":"PASS","errorMessage":{"value":null},"passingAtoms":["label:Clean-Code=MAX"],"failingAtoms":[],"atomExplanations":{"value":{"label:Clean-Code=MAX":""}}}
+      },
+      "overrideExpressionResult": {},
+      "patchSetCommitId": "371246106e095fabf99d0aa98469adf76189168f",
+      "legacy": {
+        "value": false
+      },
+      "forced": {},
+      "hidden": {}
+    }
+  ]
+}
