@@ -1,5 +1,7 @@
 #pragma once
 
+#include "utl/cast/Narrow.hpp"
+
 #include <array>
 #include <atomic>
 #include <cstdint>
@@ -82,8 +84,8 @@ public:
         {
             throw std::out_of_range("FileMemoryBuffer::write");
         }
-        theFile.seekp(anIndex);
-        theFile.write(reinterpret_cast<const char*>(aData.data()), aData.size());
+        theFile.seekp(narrow_cast<std::streamoff>(anIndex));
+        theFile.write(reinterpret_cast<const char*>(aData.data()), narrow_cast<std::streamsize>(aData.size()));
         theFile.flush();
     }
 
@@ -93,8 +95,8 @@ public:
         {
             throw std::out_of_range("FileMemoryBuffer::read");
         }
-        theFile.seekg(anIndex);
-        theFile.read(reinterpret_cast<char*>(aOutBuffer.data()), aOutBuffer.size());
+        theFile.seekg(narrow_cast<std::streamoff>(anIndex));
+        theFile.read(reinterpret_cast<char*>(aOutBuffer.data()), narrow_cast<std::streamsize>(aOutBuffer.size()));
     }
 
 private:
@@ -144,7 +146,7 @@ private:
     {
         const auto myCurrPushIndex = thePushIndex.load(std::memory_order_relaxed);
         const auto myWriteSize = aWriteableData.size();
-        const std::int32_t myNextPushIndex = (myCurrPushIndex + myWriteSize) % theCapacity;
+        const auto myNextPushIndex = (myCurrPushIndex + myWriteSize) % theCapacity;
         if (myNextPushIndex == thePullIndex.load(std::memory_order_acquire))
         {
             return false;
@@ -158,7 +160,7 @@ private:
     {
         const auto myCurrPullIndex = thePullIndex.load(std::memory_order_relaxed);
         const auto myReadSize = aOutputData.size();
-        const std::int32_t myNextPullIndex = (myCurrPullIndex + myReadSize) % theCapacity;
+        const auto myNextPullIndex = (myCurrPullIndex + myReadSize) % theCapacity;
         if (myNextPullIndex > thePushIndex.load(std::memory_order_acquire))
         {
             return false;
@@ -170,7 +172,7 @@ private:
 
     std::size_t theCapacity;
     std::unique_ptr<StorageInterface> theBufferStorage;
-    std::atomic<std::int32_t> thePushIndex; // points to index to push new data
-    std::atomic<std::int32_t> thePullIndex; // points to index to pull data
+    std::atomic<std::uint64_t> thePushIndex; // points to index to push new data
+    std::atomic<std::uint64_t> thePullIndex; // points to index to pull data
 };
 } // namespace mage::utl

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "utl/cast/Narrow.hpp"
+
 #include <array>
 #include <cstdint>
 #include <functional>
@@ -34,9 +36,9 @@ private:
 template <typename TypeT, std::int64_t SizeT, FillWithOnes FillWithOnesV>
 FenwickTree<TypeT, SizeT, FillWithOnesV>::FenwickTree(Operation anOperation) : theOperation(std::move(anOperation))
 {
-    for (std::int64_t anIndex = 0; anIndex < SizeT; ++anIndex)
+    for (std::int64_t myIndex = 0; myIndex < SizeT; ++myIndex)
     {
-        theData[anIndex] = FillWithOnesV == FillWithOnes::Enabled ? 1 : 0;
+        theData[narrow_cast<std::size_t>(myIndex)] = FillWithOnesV == FillWithOnes::Enabled ? 1 : 0;
     }
 }
 
@@ -45,7 +47,7 @@ void FenwickTree<TypeT, SizeT, FillWithOnesV>::insertDiffAt(std::int64_t anIndex
 {
     for (; anIndex < SizeT; anIndex = anIndex | (anIndex + 1))
     {
-        theData[anIndex] = theOperation(theData[anIndex], aDiff);
+        theData[narrow_cast<std::size_t>(anIndex)] = theOperation(theData[narrow_cast<std::size_t>(anIndex)], aDiff);
     }
 }
 
@@ -55,7 +57,7 @@ TypeT FenwickTree<TypeT, SizeT, FillWithOnesV>::getAccumulation(std::int64_t anI
     TypeT myResult = FillWithOnesV == FillWithOnes::Enabled ? 1 : 0;
     for (; anIndex >= 0; anIndex = (anIndex & (anIndex + 1)) - 1)
     {
-        myResult = theOperation(myResult, theData[anIndex]);
+        myResult = theOperation(myResult, theData[narrow_cast<std::size_t>(anIndex)]);
     }
     return myResult;
 }
