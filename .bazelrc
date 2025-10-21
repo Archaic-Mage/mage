@@ -1,9 +1,47 @@
-common --cxxopt=-std=c++20
-common --cxxopt=-Werror
-common --cxxopt=-Wall
+# platform specific compiler
+build --repo_env=CC=clang
+build --repo_env=CXX=clang++
+
+# mac support
 common --macos_minimum_os=13.3
+
+# C++20
+common --cxxopt='-std=c++20'
+
+# Warnings
+common --cxxopt='-Wall'
+common --cxxopt='-Werror'
+common --cxxopt='-Wextra'
+common --cxxopt='-Wextra-semi'
+common --cxxopt='-Wconversion'
+common --cxxopt='-Wnewline-eof'
+common --cxxopt='-Wstrict-prototypes'
+common --cxxopt='-Wold-style-cast'
+common --cxxopt='-Wno-unused-parameter'
+common --cxxopt='-Wnonportable-system-include-path'
+common --cxxopt='-Wwrite-strings'
+common --cxxopt='-Wimplicit-fallthrough'
+
+# Configuration
+common --cxxopt='-fno-rtti'
+common --cxxopt='-fomit-frame-pointer'
+common --cxxopt='-funwind-tables'
+
+# Exclude external dependencies from strict warnings
+common --per_file_copt=external/.*@-Wno-all
+common --per_file_copt=external/.*@-Wno-extra
+common --per_file_copt=external/.*@-Wno-extra-semi
+common --per_file_copt=external/.*@-Wno-conversion
+common --per_file_copt=external/.*@-Wno-newline-eof
+common --per_file_copt=external/.*@-Wno-strict-prototypes
+common --per_file_copt=external/.*@-Wno-old-style-cast
+common --per_file_copt=external/.*@-Wno-unused-parameter
+common --per_file_copt=external/.*@-Wno-nonportable-system-include-path
+common --per_file_copt=external/.*@-Wno-write-strings
+common --per_file_copt=external/.*@-Wno-implicit-fallthrough
+# common --per_file_copt=external/.*@-Wno-error
 
 test --flaky_test_attempts=3
 test --test_timeout=300
 
-try-import %workspace%/.bazelrc.user
+try-import %workspace%/user.bazelrc

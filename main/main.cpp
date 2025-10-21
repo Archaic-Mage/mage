@@ -1,5 +1,8 @@
 #include "main/main.hpp"
 
+#include "absl/log/globals.h"
+#include "absl/log/initialize.h"
+#include "absl/log/log_sink_registry.h"
 #include "utl/log/Log.hpp"
 #include "utl/log/StdoutLogSink.hpp"
 
