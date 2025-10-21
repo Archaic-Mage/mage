@@ -13,6 +13,9 @@ cc_library(
         "FenwickTree.hpp",
         "RingBuffer.hpp",
     ],
+    deps = [
+        "//utl/cast:narrow",
+    ],
     implementation_deps = [
         "//utl/log",
     ],

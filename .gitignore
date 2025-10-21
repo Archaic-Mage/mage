@@ -16,13 +16,15 @@ compile_commands.json
 /.project
 /.settings
 /.vscode/
+/.zed/
 /.cache/
 /bazel.iml
 
 # Ignore all bazel-* symlinks. There is no full list since this can change
 # based on the name of the directory bazel is cloned into.
-/.bazelrc.user
+/user.bazelrc
 /bazel-*
+/genhtml/
 
 # Ignore outputs generated during Bazel bootstrapping.
 /output/

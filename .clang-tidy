@@ -92,6 +92,7 @@ Checks: '-*,
     cppcoreguidelines-pro-type-static-cast-downcast,
     cppcoreguidelines-pro-type-union-access,
     cppcoreguidelines-slicing,
+    cppcoreguidelines-avoid-goto,
     google-build-namespaces,
     google-explicit-constructor,
     google-global-names-in-headers,
@@ -183,5 +184,4 @@ Checks: '-*,
 #  gtest macros are incorrectly identified as our own code, leading to many false-positives from these checks:
 #  - cppcoreguidelines-avoid-non-const-global-variables
 #  - cppcoreguidelines-special-member-functions
-#  - cppcoreguidelines-avoid-goto
 ...
