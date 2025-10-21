@@ -1,8 +1,7 @@
 #pragma once
 
-#include "absl/log/globals.h"
-#include "absl/log/initialize.h"
-#include "absl/log/log_sink_registry.h"
+#include "absl/log/log_entry.h"
+#include "absl/log/log_sink.h"
 
 namespace mage
 {
