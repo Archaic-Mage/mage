@@ -1,0 +1,11 @@
+cc_test(
+    name = "narrow-test",
+    size = "small",
+    srcs = [
+        "NarrowTest.cpp",
+    ],
+    deps = [
+        "//utl/cast:narrow",
+        "@googletest//:gtest_main",
+    ],
+)
