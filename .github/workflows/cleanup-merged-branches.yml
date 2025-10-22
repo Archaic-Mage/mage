@@ -1,0 +1,106 @@
+name: Cleanup Merged Gerrit Branches
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Only fetch recent commits since we only check pushed commits
+          # For manual trigger, we check last 100 commits, so fetch 150 to be safe
+          fetch-depth: 150
+
+      - name: Delete merged change branches
+        run: |
+          set -e
+
+          echo "Fetching all branches..."
+          git fetch --all
+
+          # For push events, get the commits that were just pushed
+          if [ "${{ github.event_name }}" = "push" ]; then
+            BEFORE="${{ github.event.before }}"
+            AFTER="${{ github.event.after }}"
+
+            echo "Analyzing commits pushed to main..."
+            echo "Before: $BEFORE"
+            echo "After: $AFTER"
+
+            # Get commits that were just pushed
+            PUSHED_COMMITS=$(git rev-list $BEFORE..$AFTER 2>/dev/null || git rev-list $AFTER)
+          else
+            # For manual workflow_dispatch, check recent commits (last 100)
+            echo "Manual trigger: checking last 100 commits..."
+            PUSHED_COMMITS=$(git rev-list -n 100 origin/main)
+          fi
+
+          if [ -z "$PUSHED_COMMITS" ]; then
+            echo "No commits to process"
+            exit 0
+          fi
+
+          COMMIT_COUNT=$(echo "$PUSHED_COMMITS" | wc -l | tr -d ' ')
+          echo "Processing $COMMIT_COUNT commit(s)..."
+
+          # Extract Change-Ids from the pushed commits
+          CHANGE_IDS=""
+          for commit in $PUSHED_COMMITS; do
+            CHANGE_ID=$(git show -s --format='%B' "$commit" | grep -oP 'Change-Id: \K.*' || true)
+            if [ -n "$CHANGE_ID" ]; then
+              CHANGE_IDS="${CHANGE_IDS}${CHANGE_ID}"$'\n'
+              echo "  Found Change-Id: $CHANGE_ID (commit: ${commit:0:8})"
+            fi
+          done
+
+          # Remove duplicates and empty lines
+          CHANGE_IDS=$(echo "$CHANGE_IDS" | sort -u | grep -v '^$' || true)
+
+          if [ -z "$CHANGE_IDS" ]; then
+            echo "No Change-Ids found in pushed commits"
+            exit 0
+          fi
+
+          CHANGE_ID_COUNT=$(echo "$CHANGE_IDS" | wc -l | tr -d ' ')
+          echo ""
+          echo "Found $CHANGE_ID_COUNT unique Change-Id(s) to clean up"
+          echo ""
+
+          # Now delete branches that match these Change-Ids
+          DELETED_COUNT=0
+          SKIPPED_COUNT=0
+
+          for change_id in $CHANGE_IDS; do
+            BRANCH="changes/$change_id"
+            echo "Checking if branch $BRANCH exists..."
+
+            # Check if the branch exists on remote
+            if git rev-parse --verify "origin/$BRANCH" >/dev/null 2>&1; then
+              echo "✓ Branch $BRANCH exists, deleting..."
+              git push origin --delete "$BRANCH" 2>/dev/null && {
+                echo "  Deleted successfully"
+                DELETED_COUNT=$((DELETED_COUNT + 1))
+              } || {
+                echo "  ⚠️ Failed to delete $BRANCH"
+                SKIPPED_COUNT=$((SKIPPED_COUNT + 1))
+              }
+            else
+              echo "⊘ Branch $BRANCH doesn't exist (may have been already deleted)"
+              SKIPPED_COUNT=$((SKIPPED_COUNT + 1))
+            fi
+          done
+
+          echo ""
+          echo "Summary:"
+          echo "  Processed: $CHANGE_ID_COUNT Change-Id(s)"
+          echo "  Deleted: $DELETED_COUNT branch(es)"
+          echo "  Skipped: $SKIPPED_COUNT branch(es)"
