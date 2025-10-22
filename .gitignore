@@ -1,3 +1,5 @@
+.DS_Store
+
 # Ignore backup files.
 *~
 
@@ -32,3 +34,7 @@ compile_commands.json
 # Ignore jekyll build output.
 /production
 /.sass-cache
+
+
+# For Rust
+/target

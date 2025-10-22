@@ -1,0 +1,21 @@
+[package]
+name = "examples"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Example binaries for component testing rust integration."
+
+[[bin]]
+name = "guess_game"
+path = "src/guess_game.rs"
+
+[[bin]]
+name = "protos_test"
+path = "src/protos_test.rs"
+
+[dependencies]
+types = { workspace = true }
+rand = { workspace = true }
+prost = { workspace = true }
+test-proto = { workspace = true }

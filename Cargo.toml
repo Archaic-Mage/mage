@@ -1,0 +1,32 @@
+[workspace]
+members = [
+    # protocol files
+    "protocols/test-proto",
+
+    # library crates
+    "crates/types",
+
+    # binaries
+    "examples",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Soham Tripathy"]
+license = "MIT"
+repository = "https://github.com/Archaic-Mage/mage"
+
+[workspace.dependencies]
+# Internal dependencies
+types = { path = "crates/types" }
+test-proto = { path = "protocols/test-proto" }
+
+# External dependencies
+rand = "0.8.5"
+prost = "0.13"
+prost-types = "0.13"
+
+# Build dependencies (for proto generation)
+prost-build = "0.13"
