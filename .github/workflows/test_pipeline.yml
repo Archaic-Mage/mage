@@ -2,11 +2,11 @@ name: Test Pipeline
 on:
   push:
     branches:
-      - 'changes/**'
+      - "changes/**"
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
   schedule:
-    - cron: '0 0 1,15 * *'
+    - cron: "0 0 1,15 * *"
 
 permissions:
   contents: read
@@ -53,7 +53,7 @@ jobs:
 
   multiplatformtest:
     needs: detect_change_id
-    uses: ./.github/workflows/bazel-multi-platform.yml
+    uses: ./.github/workflows/multi-platform.yml
     with:
       gerrit_change_id: ${{ needs.detect_change_id.outputs.change_id }}
     secrets: inherit
