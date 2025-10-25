@@ -1,17 +1,17 @@
-name: Bazel MultiPlatform
+name: MultiPlatform Build & Test
 
 on:
   workflow_call:
     inputs:
       gerrit_change_id:
-        description: 'Gerrit change id to post the result'
+        description: "Gerrit change id to post the result"
         required: false
         type: string
-        default: ''
+        default: ""
 
 jobs:
   build:
-    name: Bazel C++ Build & Test
+    name: Build & Test
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -26,40 +26,47 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential python3 zip unzip
+          sudo apt-get install -y build-essential python3 zip unzip protobuf-compiler
 
       # (Optional) Install C++ prerequisites on macOS
       - name: Install macOS prerequisites
         if: runner.os == 'macOS'
         run: |
           brew update
-          brew install zip unzip
+          brew install zip unzip protobuf
 
-      # Cache Bazel outputs and external dependencies
-      - name: Cache Bazel
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/bazel
-            bazel-out
-            bazel-*
-            external
-          key: ${{ runner.os }}-bazel-${{ hashFiles('**/WORKSPACE', '**/*.bzl') }}
-          restore-keys: |
-            ${{ runner.os }}-bazel-
-
-      # Setup Bazel
+      # Setup Bazel with integrated caching
       - name: Setup Bazel
         uses: bazel-contrib/setup-bazel@0.15.0
         with:
           bazelisk-cache: true
           disk-cache: ${{ github.workflow }}
+          repository-cache: true
 
       # Optional: Confirm toolchain
       - name: Configure Bazel C++ toolchain
         run: |
           echo "Runner OS: ${{ runner.os }}"
           # Bazel will auto-detect the appropriate C++ toolchain
+
+      # Setup Rust toolchain
+      - name: Setup Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+
+      # Cache Rust dependencies
+      - name: Cache Cargo
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
 
       # Build all C++ targets
       - name: Bazel Build
@@ -68,6 +75,22 @@ jobs:
       # Run C++ tests
       - name: Bazel Test
         run: bazel test --cxxopt=-std=c++20 --macos_minimum_os=13.3 --test_output=errors //...
+
+      # Build all Rust targets
+      - name: Cargo Build
+        run: cargo build --workspace --all-features --verbose
+
+      # Run Rust tests
+      - name: Cargo Test
+        run: cargo test --workspace --all-features --verbose
+
+      # Run Rust linter
+      - name: Cargo Clippy
+        run: cargo clippy --workspace --all-features -- -D warnings
+
+      # Check Rust formatting
+      - name: Cargo Format Check
+        run: cargo fmt --all -- --check
 
       - name: Get VOTE
         if: ${{ always() && inputs.gerrit_change_id != '' }}
@@ -97,7 +120,7 @@ jobs:
                -H "Content-Type: application/json" \
                -X POST \
                -d '{
-                 "message": "Multi-Platform Bazel Test result",
+                 "message": "Multi-Platform Build & Test result",
                  "labels": { "${{ steps.label.outputs.label }}": "${{ steps.vote.outputs.vote }}" }
                }' \
                "https://gerrithub.io/a/changes/${{ inputs.gerrit_change_id }}/revisions/current/review"
