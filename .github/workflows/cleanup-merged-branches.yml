@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: write
 
     steps:
       - name: Checkout repository
@@ -21,6 +22,7 @@ jobs:
           fetch-depth: 150
 
       - name: Delete merged change branches
+        id: delete_branches
         run: |
           set -e
 
@@ -104,3 +106,63 @@ jobs:
           echo "  Processed: $CHANGE_ID_COUNT Change-Id(s)"
           echo "  Deleted: $DELETED_COUNT branch(es)"
           echo "  Skipped: $SKIPPED_COUNT branch(es)"
+
+          # Export CHANGE_IDS for use in cache cleanup step
+          {
+            echo "change_ids<<EOF"
+            echo "$CHANGE_IDS"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+      - name: Delete caches for merged branches
+        if: steps.delete_branches.outputs.change_ids != ''
+        run: |
+          set -e
+
+          echo ""
+          echo "Cleaning up caches for deleted branches..."
+          echo ""
+
+          TOTAL_DELETED=0
+          TOTAL_FAILED=0
+
+          # Get CHANGE_IDS from previous step output
+          CHANGE_IDS="${{ steps.delete_branches.outputs.change_ids }}"
+
+          # Process each Change-Id that was found
+          for change_id in $CHANGE_IDS; do
+            BRANCH_REF="refs/heads/changes/$change_id"
+            echo "Checking caches for $BRANCH_REF..."
+
+            # List all caches for this branch ref
+            CACHE_IDS=$(gh cache list --ref "$BRANCH_REF" --limit 100 --json id --jq '.[].id' 2>/dev/null || true)
+
+            if [ -z "$CACHE_IDS" ]; then
+              echo "  ⊘ No caches found"
+              continue
+            fi
+
+            CACHE_COUNT=$(echo "$CACHE_IDS" | wc -l | tr -d ' ')
+            echo "  Found $CACHE_COUNT cache(s) to delete"
+
+            # Delete each cache (don't fail workflow if deletion fails)
+            set +e
+            for cache_id in $CACHE_IDS; do
+              gh cache delete "$cache_id" 2>/dev/null && {
+                echo "    ✓ Deleted cache $cache_id"
+                TOTAL_DELETED=$((TOTAL_DELETED + 1))
+              } || {
+                echo "    ⚠️ Failed to delete cache $cache_id"
+                TOTAL_FAILED=$((TOTAL_FAILED + 1))
+              }
+            done
+            set -e
+          done
+
+          echo ""
+          echo "Cache Cleanup Summary:"
+          echo "  Caches deleted: $TOTAL_DELETED"
+          echo "  Caches failed: $TOTAL_FAILED"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
