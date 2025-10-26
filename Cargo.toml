@@ -5,6 +5,7 @@ members = [
 
     # library crates
     "crates/types",
+    "crates/runtime",
 
     # binaries
     "examples",
@@ -21,6 +22,7 @@ repository = "https://github.com/mage-industries/mage"
 [workspace.dependencies]
 # Internal dependencies
 types = { path = "crates/types" }
+runtime = { path = "crates/runtime" }
 test-proto = { path = "protocols/test-proto" }
 
 # External dependencies
