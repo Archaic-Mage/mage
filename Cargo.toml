@@ -16,7 +16,7 @@ version = "0.1.0"
 edition = "2021"
 authors = ["Soham Tripathy"]
 license = "MIT"
-repository = "https://github.com/Archaic-Mage/mage"
+repository = "https://github.com/mage-industries/mage"
 
 [workspace.dependencies]
 # Internal dependencies
