@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f349a93f_85cb1e28",
+        "filename": "crates/runtime/src/runtime.rs",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1038960
+      },
+      "writtenOn": "2025-10-26T17:49:18Z",
+      "side": 1,
+      "message": "could be a better way for this.",
+      "range": {
+        "startLine": 6,
+        "startChar": 6,
+        "endLine": 6,
+        "endChar": 37
+      },
+      "revId": "319375ed677d937d2ef6d60c400bda1e9fb02b78",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "348a997a_5d798e27",
+        "filename": "examples/src/runtime_app.rs",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1038960
+      },
+      "writtenOn": "2025-10-26T17:49:18Z",
+      "side": 1,
+      "message": "can we find something better than shared reference counter.",
+      "range": {
+        "startLine": 19,
+        "startChar": 11,
+        "endLine": 19,
+        "endChar": 17
+      },
+      "revId": "319375ed677d937d2ef6d60c400bda1e9fb02b78",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
